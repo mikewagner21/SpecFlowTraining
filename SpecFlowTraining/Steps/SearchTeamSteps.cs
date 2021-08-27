@@ -1,4 +1,4 @@
-﻿using Specflow.Framework;
+﻿using OpenQA.Selenium;
 using SpecFlowTraining.PageObjects;
 using System;
 using TechTalk.SpecFlow;
@@ -6,41 +6,27 @@ using TechTalk.SpecFlow;
 namespace SpecFlowTraining.Steps
 {
     [Binding]
-    public sealed class SearchTeamSteps
+    sealed class SearchTeamSteps
     {
-        protected LocalDriverBuilder builder;
-        protected string startingUrl;
-        protected string targetBrowser;
+        private IWebDriver _driver;
 
-        private readonly ScenarioContext _scenarioContext;
-
-        public SearchTeamSteps(ScenarioContext scenarioContext)
+        public SearchTeamSteps(IWebDriver driver)
         {
-            _scenarioContext = scenarioContext;
+            _driver = driver;
         }
 
-        [Given("User opens the Google Search URL")]
+        [Given(@"User opens the Google Search URL")]
         public void GivenTheUserOpensTheGoogleSearchURL()
         {
+            _driver.Navigate().GoToUrl("https://www.google.com/");
             Console.WriteLine("Step Def Opens Google.com");
         }
 
         [When("User enters a search term as (.*)")]
         public void WhenTheUserEnterASearchTerm(string searchTerm)
         {
-            //Special to this Selenium Framework
-            LocalDriverBuilder builder = new LocalDriverBuilder();
-            this.startingUrl = "http://google.com";
-            this.targetBrowser = "Chrome";
-            var driver = builder.Launch(targetBrowser, this.startingUrl);
-            driver.Manage().Window.Maximize();
-            //END Special to this Selenium Framework
-
-            var homePage = new HomePage(driver);
+            var homePage = new HomePage(_driver);
             homePage.EnterSearchText(searchTerm);
-
-            //Selenium Specific
-            driver.Quit();
         }
 
         [Then("User is able to access the search page")]
